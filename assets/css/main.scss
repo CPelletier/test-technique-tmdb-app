@@ -1,0 +1,44 @@
+// assets/css/main.scss
+@use "~/assets/css/variables" as *;
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .btn {
+    @apply px-4 py-2 rounded-md transition-all duration-200;
+    
+    &-primary {
+      @apply bg-tmdb-blue text-white hover:bg-opacity-90;
+    }
+    
+    &-secondary {
+      @apply bg-tmdb-dark text-white hover:bg-opacity-90;
+    }
+    
+    &-outline {
+      @apply border border-tmdb-blue text-tmdb-blue hover:bg-tmdb-blue hover:text-white;
+    }
+  }
+  
+  .card {
+    @apply bg-white rounded-lg shadow-md overflow-hidden transition-transform duration-200;
+    
+    &:hover {
+      @apply transform scale-[1.02];
+    }
+    
+    &-title {
+      @apply text-lg font-bold text-tmdb-dark;
+    }
+    
+    &-content {
+      @apply p-4;
+    }
+  }
+  
+  .skeleton {
+    @apply bg-gray-200 animate-pulse rounded;
+  }
+}
