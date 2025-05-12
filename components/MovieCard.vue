@@ -1,28 +1,61 @@
-// components/MovieCard.vue
+<!-- components/MovieCard.vue -->
 <script setup lang="ts">
-import { defineProps } from 'vue';
+import { defineProps, ref } from 'vue';
+import { useIntersectionObserver } from '@vueuse/core';
 import type { Movie } from '~/types/tmdb';
 
 const props = defineProps<{
   movie: Movie;
   posterBaseUrl: string;
 }>();
+
+// Pour le lazy loading des images
+const cardElement = ref(null);
+const isVisible = ref(false);
+const imageLoaded = ref(false);
+
+// Observer pour lazy loading
+useIntersectionObserver(
+  cardElement,
+  ([{ isIntersecting }]) => {
+    if (isIntersecting) {
+      isVisible.value = true;
+    }
+  },
+  { threshold: 0.1 }
+);
+
+// Gérer le chargement des images
+function handleImageLoad() {
+  imageLoaded.value = true;
+}
 </script>
 
 <template>
-  <div class="movie-card">
-    <div class="movie-poster">
+  <div ref="cardElement" class="movie-card">
+    <div class="movie-poster relative">
+      <!-- Skeleton pendant le chargement de l'image -->
+      <div 
+        v-if="!imageLoaded" 
+        class="skeleton-image absolute inset-0 bg-gray-200 animate-pulse"
+      ></div>
+      
+      <!-- Image avec lazy loading -->
       <img 
-        v-if="movie.poster_path" 
+        v-if="isVisible && movie.poster_path" 
         :src="`${posterBaseUrl}${movie.poster_path}`" 
         :alt="movie.title"
         class="w-full h-full object-cover transition-opacity duration-300"
+        :class="{ 'opacity-0': !imageLoaded, 'opacity-100': imageLoaded }"
+        @load="handleImageLoad"
         loading="lazy"
       />
-      <div v-else class="no-poster">
+      
+      <div v-else-if="isVisible && !movie.poster_path" class="no-poster">
         <span>Pas d'affiche disponible</span>
       </div>
     </div>
+    
     <div class="movie-content">
       <h3 class="movie-title">{{ movie.title }}</h3>
       <div class="movie-info">
@@ -50,6 +83,10 @@ const props = defineProps<{
     
     .no-poster {
       @apply flex items-center justify-center h-full text-gray-500;
+    }
+    
+    img {
+      @apply transition-opacity duration-300;
     }
   }
   

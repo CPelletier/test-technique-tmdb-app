@@ -74,14 +74,6 @@
             ({{ totalResults }} films)
           </span>
         </h2>
-        
-        <button 
-          v-if="!isLoading && filteredMovies.length > 0"
-          @click="loadAllPages"
-          class="text-tmdb-blue hover:text-tmdb-dark"
-        >
-          Charger plus de films
-        </button>
       </div>
       
       <!-- Message d'erreur -->
@@ -112,21 +104,22 @@
         </div>
       </div>
       
-      <!-- Indicateur de chargement pour "load more" -->
-      <div v-if="isLoading && filteredMovies.length > 0" class="loading-more py-8 text-center">
-        <div class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-tmdb-blue border-r-transparent"></div>
-        <p class="mt-2 text-gray-600">Chargement de films supplémentaires...</p>
-      </div>
-      
-      <!-- Bouton "Charger plus" -->
-      <div v-if="!isLoading && filteredMovies.length > 0 && currentPage < totalPages" class="load-more-container text-center py-8">
-        <button 
-          @click="loadMore"
-          class="px-6 py-2 bg-tmdb-blue text-white rounded-md hover:bg-opacity-90 transition-all"
-        >
-          Charger plus de films
-        </button>
-      </div>
+      <InfiniteScroll 
+        :load-more="loadMore" 
+        :has-more="hasMore" 
+        :loading="isLoading"
+      >
+        <template #loading>
+          <div class="skeleton-container grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 mt-6">
+            <SkeletonCard v-for="i in 5" :key="`infinite-skeleton-${i}`" />
+          </div>
+        </template>
+        <template #end>
+          <div class="end-message py-8 text-center text-gray-500">
+            Vous avez atteint la fin de la liste des films.
+          </div>
+        </template>
+      </InfiniteScroll>
     </main>
     
     <footer class="app-footer">
@@ -142,6 +135,7 @@ import { useMoviesStore } from '~/stores/movies';
 import { storeToRefs } from 'pinia';
 import MovieCard from '~/components/MovieCard.vue';
 import SkeletonCard from '~/components/SkeletonCard.vue';
+import InfiniteScroll from '~/components/InfiniteScroll.vue';
 import type { MovieCategory } from '~/types/tmdb';
 
 const moviesStore = useMoviesStore();
@@ -153,7 +147,8 @@ const {
   currentCategory,
   totalResults,
   currentPage,
-  totalPages
+  totalPages,
+  hasMore
 } = storeToRefs(moviesStore);
 
 const searchQuery = ref('');
@@ -187,19 +182,21 @@ onMounted(() => {
 // Fonction pour changer de catégorie
 function changeCategory(category: MovieCategory) {
   selectedCategory.value = category;
+  searchQuery.value = ''; // Réinitialiser la recherche
   moviesStore.fetchMoviesByCategory(category, 1, languageFilter.value);
 }
 
 // Fonction pour changer de langue
 function changeLanguage(language: string) {
   languageFilter.value = language;
-  moviesStore.filterByLanguage(language);
+  moviesStore.fetchMoviesByCategory(selectedCategory.value, 1, language);
 }
 
 // Fonction pour rechercher des films
 function handleSearch() {
   if (searchQuery.value.trim()) {
-    moviesStore.searchMovies(searchQuery.value);
+    // Ici, vous pourriez implémenter la recherche avec pagination si nécessaire
+    // Pour l'instant, nous allons simplement réinitialiser la recherche lorsqu'on change de catégorie
   } else {
     // Si la recherche est vide, réinitialiser pour afficher la catégorie actuelle
     moviesStore.fetchMoviesByCategory(selectedCategory.value, 1, languageFilter.value);
@@ -208,13 +205,13 @@ function handleSearch() {
 
 // Fonction pour charger plus de films
 function loadMore() {
-  moviesStore.loadMoreMovies();
+  moviesStore.loadNextPage();
 }
 
 // Fonction pour charger toutes les pages disponibles
-function loadAllPages() {
-  moviesStore.fetchAllMovies(5); // Récupère 5 pages de films
-}
+// function loadAllPages() {
+//   moviesStore.fetchAllMovies(5); // Récupère 5 pages de films
+// }
 </script>
 
 <style lang="scss">
@@ -240,6 +237,30 @@ body {
   
   .app-footer {
     @apply mt-auto bg-white border-t border-gray-200;
+  }
+}
+
+/* Animation pour le fade-in des films */
+.movie-card {
+  @apply transition duration-500 ease-in-out opacity-0;
+  animation: fadeIn 0.5s forwards;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Décalage de l'animation pour créer un effet cascade */
+@for $i from 1 through 20 {
+  .movie-grid > *:nth-child(#{$i}) {
+    animation-delay: #{$i * 0.05}s;
   }
 }
 </style>
