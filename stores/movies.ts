@@ -1,7 +1,7 @@
 // stores/movies.ts
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import type { Movie, MovieCategory } from '~/types/tmdb';
+import type { Movie, MovieCategory, UICategoryType } from '~/types/tmdb';
 
 export const useMoviesStore = defineStore('movies', () => {
   const movies = ref<Movie[]>([]);
@@ -11,7 +11,7 @@ export const useMoviesStore = defineStore('movies', () => {
   const totalResults = ref(0);
   const isLoading = ref(false);
   const error = ref<string | null>(null);
-  const currentCategory = ref<MovieCategory>('popular');
+  const currentCategory = ref<UICategoryType>('all');
   const selectedLanguage = ref(''); // Vide pour pas de filtre de langue
   const hasMore = ref(true);
   
@@ -19,6 +19,7 @@ export const useMoviesStore = defineStore('movies', () => {
   const posterBaseUrl = ref('https://image.tmdb.org/t/p/w500');
 
   const moviesCache = ref<Record<string, Record<number, Movie[]>>>({});
+  
   
   // Actions
   async function fetchMoviesByCategory(category: MovieCategory = 'popular', page = 1, language = '', reset = true) {
@@ -95,15 +96,37 @@ export const useMoviesStore = defineStore('movies', () => {
     }
   }
   
-  async function fetchAllMovies(totalPagesToFetch = 5) {
+  async function fetchAllMovies(page = 1, language = '', reset = true) {
     const { $tmdb } = useNuxtApp();
-    isLoading.value = true;
+    
+    if (page === 1 || reset) {
+      isLoading.value = true;
+    }
+    
     error.value = null;
+    currentCategory.value = 'all';
+    selectedLanguage.value = language;
     
     try {
-      const allMovies = await $tmdb.getMultiplePages('popular', totalPagesToFetch, selectedLanguage.value);
-      movies.value = allMovies;
+      const data = await $tmdb.getAllMovies(page, language);
+      
+      if (reset) {
+        movies.value = data.results;
+      } else {
+        // Ajouter les nouveaux films tout en évitant les doublons
+        const newMovieIds = new Set(data.results.map(m => m.id));
+        const existingMovieIds = new Set(movies.value.map(m => m.id));
+        
+        const uniqueNewMovies = data.results.filter(movie => !existingMovieIds.has(movie.id));
+        movies.value = [...movies.value, ...uniqueNewMovies];
+      }
+      
+      currentPage.value = data.page;
+      totalPages.value = data.total_pages;
+      totalResults.value = data.total_results;
       filteredMovies.value = movies.value;
+      
+      hasMore.value = currentPage.value < totalPages.value;
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Une erreur est survenue';
       console.error('Erreur dans fetchAllMovies:', error.value);
@@ -139,10 +162,14 @@ export const useMoviesStore = defineStore('movies', () => {
   }
 
   async function loadNextPage() {
-    // Vérifier s'il y a plus de pages à charger et si un chargement n'est pas déjà en cours
     if (currentPage.value < totalPages.value && !isLoading.value) {
       const nextPage = currentPage.value + 1;
-      await fetchMoviesByCategory(currentCategory.value, nextPage, selectedLanguage.value, false);
+      
+      if (currentCategory.value === 'all') {
+        await fetchAllMovies(nextPage, selectedLanguage.value, false);
+      } else {
+        await fetchMoviesByCategory(currentCategory.value as MovieCategory, nextPage, selectedLanguage.value, false);
+      }
     }
   }
   
@@ -154,7 +181,7 @@ export const useMoviesStore = defineStore('movies', () => {
     
     try {
       const nextPage = currentPage.value + 1;
-      const data = await $tmdb.getMoviesByCategory(currentCategory.value, nextPage, selectedLanguage.value);
+      const data = await $tmdb.getMoviesByCategory(currentCategory.value  as MovieCategory, nextPage, selectedLanguage.value);
       
       // Ajouter les nouveaux films à la liste existante
       movies.value = [...movies.value, ...data.results];
@@ -171,7 +198,7 @@ export const useMoviesStore = defineStore('movies', () => {
   function filterByLanguage(language: string) {
     selectedLanguage.value = language;
     // Rechargez les films avec la langue sélectionnée
-    fetchMoviesByCategory(currentCategory.value, 1, language);
+    fetchMoviesByCategory(currentCategory.value as MovieCategory, 1, language);
   }
   
   return {

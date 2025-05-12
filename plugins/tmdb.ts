@@ -39,6 +39,12 @@ export default defineNuxtPlugin(() => {
         throw error;
       }
     },
+
+    getAllMovies(page = 1, language = ''): Promise<MoviesResponse> {
+      const languageParam = language ? `&language=${language}` : '';
+      // Pas de filtres spécifiques pour obtenir la liste la plus large possible
+      return this.fetch<MoviesResponse>(`/discover/movie?page=${page}${languageParam}&sort_by=popularity.desc&include_adult=false`);
+    },
     
     // Méthodes pour récupérer des films par catégorie
     getMoviesByCategory(category: MovieCategory, page = 1, language = ''): Promise<MoviesResponse> {

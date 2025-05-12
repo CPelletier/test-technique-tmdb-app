@@ -136,7 +136,7 @@ import { storeToRefs } from 'pinia';
 import MovieCard from '~/components/MovieCard.vue';
 import SkeletonCard from '~/components/SkeletonCard.vue';
 import InfiniteScroll from '~/components/InfiniteScroll.vue';
-import type { MovieCategory } from '~/types/tmdb';
+import type { MovieCategory, UICategoryType } from '~/types/tmdb';
 
 const moviesStore = useMoviesStore();
 const { 
@@ -146,17 +146,16 @@ const {
   posterBaseUrl, 
   currentCategory,
   totalResults,
-  currentPage,
-  totalPages,
   hasMore
 } = storeToRefs(moviesStore);
 
 const searchQuery = ref('');
-const selectedCategory = ref<MovieCategory>('popular');
+const selectedCategory = ref<UICategoryType>('all');
 const languageFilter = ref('');
 
 // Options pour les catégories
 const categoryOptions = [
+  { value: 'all', label: 'Tous les films' },
   { value: 'popular', label: 'Populaires' },
   { value: 'top_rated', label: 'Mieux notés' },
   { value: 'upcoming', label: 'À venir' },
@@ -176,20 +175,31 @@ const languageOptions = [
 
 // Charger les films dès le chargement de la page
 onMounted(() => {
-  moviesStore.fetchMoviesByCategory('popular', 1, languageFilter.value);
+  moviesStore.fetchAllMovies(1, languageFilter.value);
 });
 
 // Fonction pour changer de catégorie
-function changeCategory(category: MovieCategory) {
+function changeCategory(category: UICategoryType) {
   selectedCategory.value = category;
   searchQuery.value = ''; // Réinitialiser la recherche
-  moviesStore.fetchMoviesByCategory(category, 1, languageFilter.value);
+  
+  if (category === 'all') {
+    moviesStore.fetchAllMovies(1, languageFilter.value);
+  } else {
+    moviesStore.fetchMoviesByCategory(category as MovieCategory, 1, languageFilter.value);
+  }
 }
 
 // Fonction pour changer de langue
 function changeLanguage(language: string) {
   languageFilter.value = language;
-  moviesStore.fetchMoviesByCategory(selectedCategory.value, 1, language);
+  
+  // Utiliser la bonne méthode selon la catégorie sélectionnée
+  if (selectedCategory.value === 'all') {
+    moviesStore.fetchAllMovies(1, language);
+  } else {
+    moviesStore.fetchMoviesByCategory(selectedCategory.value as MovieCategory, 1, language);
+  }
 }
 
 // Fonction pour rechercher des films
@@ -199,7 +209,7 @@ function handleSearch() {
     // Pour l'instant, nous allons simplement réinitialiser la recherche lorsqu'on change de catégorie
   } else {
     // Si la recherche est vide, réinitialiser pour afficher la catégorie actuelle
-    moviesStore.fetchMoviesByCategory(selectedCategory.value, 1, languageFilter.value);
+    moviesStore.fetchMoviesByCategory(selectedCategory.value as MovieCategory, 1, languageFilter.value);
   }
 }
 

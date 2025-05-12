@@ -29,3 +29,5 @@ export interface MovieDetails extends Movie {
 }
 
 export type MovieCategory = 'popular' | 'top_rated' | 'upcoming' | 'now_playing' | 'latest' | 'discover';
+
+export type UICategoryType = MovieCategory | 'all';
