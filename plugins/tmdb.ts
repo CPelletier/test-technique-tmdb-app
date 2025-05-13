@@ -1,5 +1,5 @@
 // plugins/tmdb.ts
-import type { Movie, MoviesResponse, MovieDetails, MovieCategory } from '~/types/tmdb';
+import type { Movie, MoviesResponse, MovieDetails, MovieCategory, SortOption } from '~/types/tmdb';
 
 interface FetchOptions extends RequestInit {
   headers?: Record<string, string>;
@@ -40,16 +40,23 @@ export default defineNuxtPlugin(() => {
       }
     },
 
-    getAllMovies(page = 1, language = ''): Promise<MoviesResponse> {
+    getAllMovies(page = 1, language = '', sortBy: SortOption = 'popularity.desc'): Promise<MoviesResponse> {
       const languageParam = language ? `&language=${language}` : '';
-      // Pas de filtres spécifiques pour obtenir la liste la plus large possible
-      return this.fetch<MoviesResponse>(`/discover/movie?page=${page}${languageParam}&sort_by=popularity.desc&include_adult=false`);
+      return this.fetch<MoviesResponse>(
+        `/discover/movie?page=${page}${languageParam}&sort_by=${sortBy}&include_adult=false`
+      );
     },
     
-    // Méthodes pour récupérer des films par catégorie
     getMoviesByCategory(category: MovieCategory, page = 1, language = ''): Promise<MoviesResponse> {
       const languageParam = language ? `&language=${language}` : '';
       return this.fetch<MoviesResponse>(`/movie/${category}?page=${page}${languageParam}`);
+    },
+    
+    searchMovies(query: string, page = 1, language = ''): Promise<MoviesResponse> {
+      const languageParam = language ? `&language=${language}` : '';
+      return this.fetch<MoviesResponse>(
+        `/search/movie?query=${encodeURIComponent(query)}&page=${page}${languageParam}`
+      );
     },
     
     // Méthode pour la découverte de films avec des filtres
@@ -66,12 +73,6 @@ export default defineNuxtPlugin(() => {
     getMovieDetails(id: number, language = ''): Promise<MovieDetails> {
       const languageParam = language ? `?language=${language}` : '';
       return this.fetch<MovieDetails>(`/movie/${id}${languageParam}`);
-    },
-    
-    // Rechercher des films
-    searchMovies(query: string, page = 1, language = ''): Promise<MoviesResponse> {
-      const languageParam = language ? `&language=${language}` : '';
-      return this.fetch<MoviesResponse>(`/search/movie?query=${encodeURIComponent(query)}&page=${page}${languageParam}`);
     },
     
     // Récupérer plusieurs pages de films (fonction avancée)

@@ -1,4 +1,3 @@
-// types/tmdb.ts
 export interface Movie {
   id: number;
   title: string;
@@ -29,5 +28,5 @@ export interface MovieDetails extends Movie {
 }
 
 export type MovieCategory = 'popular' | 'top_rated' | 'upcoming' | 'now_playing' | 'latest' | 'discover';
-
 export type UICategoryType = MovieCategory | 'all';
+export type SortOption = 'popularity.desc' | 'vote_average.desc' | 'release_date.desc' | 'revenue.desc';

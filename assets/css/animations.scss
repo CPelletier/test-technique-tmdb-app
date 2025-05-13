@@ -1,0 +1,34 @@
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.movie-card {
+  animation: fadeIn 0.5s forwards;
+  opacity: 0;
+}
+
+/* Décalage de l'animation pour créer un effet cascade */
+@for $i from 1 through 20 {
+  .movie-grid > *:nth-child(#{$i}) {
+    animation-delay: #{$i * 0.05}s;
+  }
+}
+
+.loading-indicator {
+  @apply flex justify-center items-center py-6;
+  
+  .spinner {
+    @apply inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-tmdb-blue border-r-transparent;
+  }
+}
+
+.end-message {
+  @apply py-8 text-center text-gray-500;
+}

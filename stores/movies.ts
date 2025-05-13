@@ -1,9 +1,10 @@
 // stores/movies.ts
 import { defineStore } from 'pinia';
-import { ref } from 'vue';
-import type { Movie, MovieCategory, UICategoryType } from '~/types/tmdb';
+import { ref, computed } from 'vue';
+import type { Movie, MovieCategory, UICategoryType, SortOption } from '~/types/tmdb';
 
 export const useMoviesStore = defineStore('movies', () => {
+  // États existants
   const movies = ref<Movie[]>([]);
   const filteredMovies = ref<Movie[]>([]);
   const currentPage = ref(1);
@@ -12,23 +13,24 @@ export const useMoviesStore = defineStore('movies', () => {
   const isLoading = ref(false);
   const error = ref<string | null>(null);
   const currentCategory = ref<UICategoryType>('all');
-  const selectedLanguage = ref(''); // Vide pour pas de filtre de langue
+  const selectedLanguage = ref('');
+  const posterBaseUrl = ref('https://image.tmdb.org/t/p/w500');
   const hasMore = ref(true);
   
-  // Computed properties
-  const posterBaseUrl = ref('https://image.tmdb.org/t/p/w500');
-
-  const moviesCache = ref<Record<string, Record<number, Movie[]>>>({});
-  
+  // Nouvel état pour suivre le contexte de recherche
+  const searchMode = ref(false);
+  const currentSearchQuery = ref('');
+  const currentSortOption = ref<SortOption>('popularity.desc');
   
   // Actions
-  async function fetchMoviesByCategory(category: MovieCategory = 'popular', page = 1, language = '', reset = true) {
+  async function fetchMoviesByCategory(category: MovieCategory, page = 1, language = '', reset = true) {
+    // Réinitialiser le mode de recherche
+    searchMode.value = false;
+    currentSearchQuery.value = '';
+    
     const { $tmdb } = useNuxtApp();
     
-    // Créer une clé de cache basée sur la catégorie et la langue
-    const cacheKey = `${category}-${language || 'all'}`;
-    
-    if (reset) {
+    if (page === 1 || reset) {
       isLoading.value = true;
     }
     
@@ -37,39 +39,7 @@ export const useMoviesStore = defineStore('movies', () => {
     selectedLanguage.value = language;
     
     try {
-      // Vérifier si les données sont dans le cache
-      if (moviesCache.value[cacheKey] && moviesCache.value[cacheKey][page]) {
-        console.log(`Récupération depuis le cache: ${cacheKey} page ${page}`);
-        
-        if (reset) {
-          movies.value = moviesCache.value[cacheKey][page];
-        } else {
-          // Ajouter les films du cache à la liste existante
-          const cachedMovies = moviesCache.value[cacheKey][page];
-          const existingMovieIds = new Set(movies.value.map(m => m.id));
-          const uniqueCachedMovies = cachedMovies.filter(movie => !existingMovieIds.has(movie.id));
-          movies.value = [...movies.value, ...uniqueCachedMovies];
-        }
-        
-        // Mise à jour des valeurs de pagination depuis le cache
-        currentPage.value = page;
-        // Note: totalPages et totalResults pourraient ne pas être mis à jour ici si nous n'avons pas ces informations dans le cache
-        
-        filteredMovies.value = movies.value;
-        hasMore.value = true; // Supposons qu'il y a plus de pages pour l'instant
-        
-        isLoading.value = false;
-        return;
-      }
-      
-      // Si les données ne sont pas dans le cache, les récupérer de l'API
       const data = await $tmdb.getMoviesByCategory(category, page, language);
-      
-      // Mettre à jour le cache
-      if (!moviesCache.value[cacheKey]) {
-        moviesCache.value[cacheKey] = {};
-      }
-      moviesCache.value[cacheKey][page] = data.results;
       
       if (reset) {
         movies.value = data.results;
@@ -96,7 +66,12 @@ export const useMoviesStore = defineStore('movies', () => {
     }
   }
   
-  async function fetchAllMovies(page = 1, language = '', reset = true) {
+  async function fetchAllMovies(page = 1, language = '', sortBy: SortOption = 'popularity.desc', reset = true) {
+    // Réinitialiser le mode de recherche
+    searchMode.value = false;
+    currentSearchQuery.value = '';
+    currentSortOption.value = sortBy;
+    
     const { $tmdb } = useNuxtApp();
     
     if (page === 1 || reset) {
@@ -108,12 +83,12 @@ export const useMoviesStore = defineStore('movies', () => {
     selectedLanguage.value = language;
     
     try {
-      const data = await $tmdb.getAllMovies(page, language);
+      const data = await $tmdb.getAllMovies(page, language, sortBy);
       
       if (reset) {
         movies.value = data.results;
       } else {
-        // Ajouter les nouveaux films tout en évitant les doublons
+        // Ajouter les nouveaux films
         const newMovieIds = new Set(data.results.map(m => m.id));
         const existingMovieIds = new Set(movies.value.map(m => m.id));
         
@@ -135,24 +110,49 @@ export const useMoviesStore = defineStore('movies', () => {
     }
   }
   
-  async function searchMovies(query: string) {
+  async function searchMovies(query: string, page = 1, reset = true) {
     if (!query.trim()) {
-      filteredMovies.value = movies.value;
+      // Si la recherche est vide, revenir à la catégorie actuelle
+      if (currentCategory.value === 'all') {
+        fetchAllMovies(1, selectedLanguage.value, currentSortOption.value);
+      } else {
+        fetchMoviesByCategory(currentCategory.value as MovieCategory, 1, selectedLanguage.value);
+      }
       return;
     }
     
+    // Activer le mode recherche
+    searchMode.value = true;
+    currentSearchQuery.value = query;
+    
     const { $tmdb } = useNuxtApp();
-    isLoading.value = true;
+    
+    if (page === 1 || reset) {
+      isLoading.value = true;
+    }
+    
     error.value = null;
     
     try {
-      const data = await $tmdb.searchMovies(query, 1, selectedLanguage.value);
-      filteredMovies.value = data.results;
+      const data = await $tmdb.searchMovies(query, page, selectedLanguage.value);
       
-      // Mise à jour des informations de pagination pour l'interface
+      if (reset) {
+        movies.value = data.results;
+      } else {
+        // Ajouter les nouveaux films
+        const newMovieIds = new Set(data.results.map(m => m.id));
+        const existingMovieIds = new Set(movies.value.map(m => m.id));
+        
+        const uniqueNewMovies = data.results.filter(movie => !existingMovieIds.has(movie.id));
+        movies.value = [...movies.value, ...uniqueNewMovies];
+      }
+      
       currentPage.value = data.page;
       totalPages.value = data.total_pages;
       totalResults.value = data.total_results;
+      filteredMovies.value = movies.value;
+      
+      hasMore.value = currentPage.value < totalPages.value;
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Une erreur est survenue';
       console.error('Erreur dans searchMovies:', error.value);
@@ -160,45 +160,23 @@ export const useMoviesStore = defineStore('movies', () => {
       isLoading.value = false;
     }
   }
-
+  
+  // Méthode loadNextPage qui prend en compte tous les contextes
   async function loadNextPage() {
     if (currentPage.value < totalPages.value && !isLoading.value) {
       const nextPage = currentPage.value + 1;
       
-      if (currentCategory.value === 'all') {
-        await fetchAllMovies(nextPage, selectedLanguage.value, false);
+      if (searchMode.value) {
+        // Si on est en mode recherche, charger la page suivante de la recherche
+        await searchMovies(currentSearchQuery.value, nextPage, false);
+      } else if (currentCategory.value === 'all') {
+        // Si on affiche tous les films, utiliser la fonction appropriée
+        await fetchAllMovies(nextPage, selectedLanguage.value, currentSortOption.value, false);
       } else {
+        // Sinon, charger la page suivante de la catégorie actuelle
         await fetchMoviesByCategory(currentCategory.value as MovieCategory, nextPage, selectedLanguage.value, false);
       }
     }
-  }
-  
-  async function loadMoreMovies() {
-    if (currentPage.value >= totalPages.value || isLoading.value) return;
-    
-    const { $tmdb } = useNuxtApp();
-    isLoading.value = true;
-    
-    try {
-      const nextPage = currentPage.value + 1;
-      const data = await $tmdb.getMoviesByCategory(currentCategory.value  as MovieCategory, nextPage, selectedLanguage.value);
-      
-      // Ajouter les nouveaux films à la liste existante
-      movies.value = [...movies.value, ...data.results];
-      filteredMovies.value = movies.value;
-      currentPage.value = data.page;
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Une erreur est survenue';
-      console.error('Erreur dans loadMoreMovies:', error.value);
-    } finally {
-      isLoading.value = false;
-    }
-  }
-  
-  function filterByLanguage(language: string) {
-    selectedLanguage.value = language;
-    // Rechargez les films avec la langue sélectionnée
-    fetchMoviesByCategory(currentCategory.value as MovieCategory, 1, language);
   }
   
   return {
@@ -212,12 +190,13 @@ export const useMoviesStore = defineStore('movies', () => {
     currentCategory,
     selectedLanguage,
     posterBaseUrl,
+    hasMore,
+    searchMode,
+    currentSearchQuery,
+    currentSortOption,
     fetchMoviesByCategory,
     fetchAllMovies,
     searchMovies,
-    loadMoreMovies,
-    filterByLanguage,
-    loadNextPage,
-    hasMore
+    loadNextPage
   };
 });

@@ -1,0 +1,97 @@
+.movies-section {
+  @apply mb-8;
+  
+  .section-header {
+    @apply mb-6 flex justify-between items-center;
+    
+    .section-title {
+      @apply text-xl font-semibold;
+      
+      .results-count {
+        @apply text-sm font-normal text-gray-500 ml-2;
+      }
+    }
+  }
+  
+  .movie-grid {
+    @apply grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6;
+  }
+  
+  .no-movies {
+    @apply col-span-full py-12 text-center text-lg text-gray-500;
+  }
+}
+
+// Style pour les cartes MovieCard
+.movie-card {
+  @apply bg-white rounded-lg shadow-md overflow-hidden transition-transform duration-200;
+  
+  &:hover {
+    @apply transform scale-[1.02];
+  }
+  
+  .movie-poster {
+    @apply h-64 bg-gray-200 relative;
+    
+    .no-poster {
+      @apply flex items-center justify-center h-full text-gray-500;
+    }
+    
+    img {
+      @apply w-full h-full object-cover transition-opacity duration-300;
+    }
+  }
+  
+  .movie-content {
+    @apply p-4;
+    
+    .movie-title {
+      @apply text-lg font-bold text-tmdb-dark mb-2 line-clamp-1;
+    }
+    
+    .movie-info {
+      @apply flex justify-between text-sm text-gray-600 mb-2;
+      
+      .movie-year {
+        @apply text-gray-600;
+      }
+      
+      .movie-rating {
+        @apply flex items-center;
+        
+        .star {
+          @apply text-yellow-500 mr-1;
+        }
+      }
+    }
+    
+    .movie-overview {
+      @apply text-sm text-gray-700 line-clamp-3;
+    }
+  }
+}
+
+// Style pour SkeletonCard
+.skeleton-card {
+  @apply bg-white rounded-lg shadow-md overflow-hidden;
+  
+  .skeleton-image {
+    @apply w-full h-64 bg-gray-200 animate-pulse;
+  }
+  
+  .skeleton-content {
+    @apply p-4;
+    
+    .skeleton-title {
+      @apply h-6 bg-gray-200 rounded w-3/4 mb-4 animate-pulse;
+    }
+    
+    .skeleton-text {
+      @apply h-4 bg-gray-200 rounded w-full mb-2 animate-pulse;
+      
+      &-short {
+        @apply w-2/3;
+      }
+    }
+  }
+}

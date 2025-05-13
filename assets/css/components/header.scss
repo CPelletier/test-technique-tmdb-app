@@ -1,0 +1,11 @@
+.app-header {
+  @apply bg-white shadow-sm sticky top-0 z-10;
+  
+  .app-title {
+    @apply text-2xl font-bold text-tmdb-dark mb-4;
+    
+    &-highlight {
+      @apply text-tmdb-light;
+    }
+  }
+}

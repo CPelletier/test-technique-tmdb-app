@@ -1,0 +1,11 @@
+.app-footer {
+  @apply mt-auto bg-white border-t border-gray-200;
+  
+  .footer-text {
+    @apply text-center text-sm text-gray-600;
+    
+    .footer-link {
+      @apply text-tmdb-blue hover:underline;
+    }
+  }
+}
