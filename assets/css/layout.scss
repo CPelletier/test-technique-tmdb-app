@@ -13,3 +13,18 @@ main {
 .error-message {
   @apply mb-6 p-4 bg-red-100 text-red-700 rounded;
 }
+
+.app-layout {
+  @apply min-h-screen flex flex-col;
+}
+
+.page-enter-active,
+.page-leave-active {
+  transition: all 0.4s ease-out;
+}
+
+.page-enter-from,
+.page-leave-to {
+  opacity: 0;
+  filter: blur(1rem);
+}

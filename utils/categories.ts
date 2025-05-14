@@ -1,4 +1,4 @@
-import type { MovieCategory, UICategoryType } from '~/types/tmdb';
+import type { UICategoryType } from '~/types/tmdb';
 
 export function isApiCategory(category: UICategoryType): category is Exclude<UICategoryType, 'all'> {
   return category !== 'all';

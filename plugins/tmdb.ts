@@ -1,5 +1,5 @@
 // plugins/tmdb.ts
-import type { Movie, MoviesResponse, MovieDetails, MovieCategory, SortOption } from '~/types/tmdb';
+import type { Movie, MoviesResponse, MovieDetails, MovieCategory, SortOption, MovieCredits, FullMovieDetails } from '~/types/tmdb';
 
 interface FetchOptions extends RequestInit {
   headers?: Record<string, string>;
@@ -73,6 +73,23 @@ export default defineNuxtPlugin(() => {
     getMovieDetails(id: number, language = ''): Promise<MovieDetails> {
       const languageParam = language ? `?language=${language}` : '';
       return this.fetch<MovieDetails>(`/movie/${id}${languageParam}`);
+    },
+
+    getMovieCredits(id: number, language = ''): Promise<MovieCredits> {
+      const languageParam = language ? `?language=${language}` : '';
+      return this.fetch<MovieCredits>(`/movie/${id}/credits${languageParam}`);
+    },
+
+    getFullMovieDetails(id: number, language = ''): Promise<FullMovieDetails> {
+      return Promise.all([
+        this.getMovieDetails(id, language),
+        this.getMovieCredits(id, language)
+      ]).then(([details, credits]) => {
+        return {
+          ...details,
+          credits
+        };
+      });
     },
     
     // Récupérer plusieurs pages de films (fonction avancée)

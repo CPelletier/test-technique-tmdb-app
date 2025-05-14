@@ -3,11 +3,14 @@
 import { defineProps, ref } from 'vue';
 import { useIntersectionObserver } from '@vueuse/core';
 import type { Movie } from '~/types/tmdb';
+import { generateSlug } from '~/utils/slug';
 
 const props = defineProps<{
   movie: Movie;
   posterBaseUrl: string;
 }>();
+
+const router = useRouter();
 
 // Pour le lazy loading des images
 const cardElement = ref(null);
@@ -29,10 +32,16 @@ useIntersectionObserver(
 function handleImageLoad() {
   imageLoaded.value = true;
 }
+
+function goToMovieDetails() {
+  const slug = generateSlug(props.movie.title, props.movie.id);
+  router.push(`/movie/${slug}`);
+}
+
 </script>
 
 <template>
-  <div ref="cardElement" class="movie-card">
+  <div ref="cardElement" class="movie-card cursor-pointer" @click="goToMovieDetails">
     <div class="movie-poster relative">
       <!-- Skeleton pendant le chargement de l'image -->
       <div 

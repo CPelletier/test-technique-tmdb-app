@@ -1,7 +1,7 @@
 // stores/movies.ts
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import type { Movie, MovieCategory, UICategoryType, SortOption } from '~/types/tmdb';
+import type { Movie, MovieCategory, UICategoryType, SortOption, FullMovieDetails } from '~/types/tmdb';
 
 export const useMoviesStore = defineStore('movies', () => {
   // États existants
@@ -16,6 +16,10 @@ export const useMoviesStore = defineStore('movies', () => {
   const selectedLanguage = ref('');
   const posterBaseUrl = ref('https://image.tmdb.org/t/p/w500');
   const hasMore = ref(true);
+  const currentMovie = ref<FullMovieDetails | null>(null);
+  const isLoadingMovie = ref(false);
+  const movieError = ref<string | null>(null);
+
   
   // Nouvel état pour suivre le contexte de recherche
   const searchMode = ref(false);
@@ -178,6 +182,22 @@ export const useMoviesStore = defineStore('movies', () => {
       }
     }
   }
+
+  async function fetchMovieDetails(id: number) {
+    const { $tmdb } = useNuxtApp();
+    isLoadingMovie.value = true;
+    movieError.value = null;
+    
+    try {
+      const data = await $tmdb.getFullMovieDetails(id, selectedLanguage.value);
+      currentMovie.value = data;
+    } catch (err) {
+      movieError.value = err instanceof Error ? err.message : 'Une erreur est survenue';
+      console.error(`Erreur dans fetchMovieDetails (${id}):`, movieError.value);
+    } finally {
+      isLoadingMovie.value = false;
+    }
+  }
   
   return {
     movies,
@@ -197,6 +217,10 @@ export const useMoviesStore = defineStore('movies', () => {
     fetchMoviesByCategory,
     fetchAllMovies,
     searchMovies,
-    loadNextPage
+    loadNextPage,
+    currentMovie,
+    isLoadingMovie,
+    movieError,
+    fetchMovieDetails
   };
 });

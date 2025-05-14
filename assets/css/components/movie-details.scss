@@ -1,0 +1,185 @@
+.movie-details-container {
+  @apply container mx-auto px-4 py-6 max-w-7xl flex-grow;
+  
+  .back-button {
+    @apply inline-flex items-center px-4 py-2 mb-6 bg-tmdb-blue text-white rounded-md hover:bg-opacity-90 transition-colors;
+  }
+  
+  .loading-container {
+    @apply flex flex-col md:flex-row gap-8;
+    
+    .skeleton-poster {
+      @apply w-full md:w-1/3 h-96 bg-gray-200 animate-pulse rounded;
+    }
+    
+    .skeleton-content {
+      @apply flex-1;
+      
+      .skeleton-title {
+        @apply h-10 bg-gray-200 animate-pulse rounded w-3/4 mb-4;
+      }
+      
+      .skeleton-text {
+        @apply h-6 bg-gray-200 animate-pulse rounded w-full mb-3;
+      }
+    }
+  }
+  
+  .error-message {
+    @apply p-4 bg-red-100 text-red-700 rounded;
+  }
+  
+  .not-found {
+    @apply text-center py-12;
+    
+    h2 {
+      @apply text-2xl font-bold mb-4;
+    }
+    
+    p {
+      @apply mb-6 text-gray-600;
+    }
+  }
+}
+
+.movie-details {
+  @apply flex flex-col gap-8;
+  
+  .movie-hero {
+    @apply relative rounded-xl overflow-hidden p-4 md:p-8;
+    
+    .movie-backdrop {
+      @apply absolute inset-0 bg-cover bg-center;
+      // filter: blur(20px);
+      
+      // &::after {
+      //   content: '';
+      //   @apply absolute inset-0 bg-gradient-to-t from-white to-transparent;
+      // }
+    }
+    
+    .movie-backdrop-fallback {
+      @apply absolute inset-0 bg-gradient-to-b from-tmdb-dark to-tmdb-blue opacity-20;
+    }
+    
+    .movie-poster-container {
+      @apply relative z-10 flex justify-center md:justify-start mb-8 md:mb-0 md:float-left md:mr-8;
+      
+      .movie-poster {
+        @apply w-64 h-auto rounded-lg shadow-lg;
+      }
+      
+      .no-poster {
+        @apply w-64 h-96 flex items-center justify-center bg-gray-200 rounded-lg shadow-lg text-gray-500;
+      }
+    }
+    
+    .movie-header {
+      @apply relative z-10;
+      
+      .movie-title {
+        @apply text-3xl font-bold mb-2;
+      }
+      
+      .movie-meta {
+        @apply flex gap-4 text-gray-600 mb-4;
+      }
+      
+      .movie-rating {
+        @apply flex items-center gap-3 mb-4;
+        
+        .rating-value {
+          @apply text-xl font-bold flex items-center;
+          
+          .star {
+            @apply text-yellow-500 mr-1;
+          }
+        }
+        
+        .rating-count {
+          @apply text-gray-600;
+        }
+      }
+      
+      .movie-genres {
+        @apply flex flex-wrap gap-2;
+        
+        .genre-tag {
+          @apply px-3 py-1 bg-tmdb-blue text-white text-sm rounded-full;
+        }
+      }
+    }
+  }
+  
+  .movie-main-content {
+    @apply grid grid-cols-1 md:grid-cols-3 gap-8 px-4;
+    
+    .movie-overview {
+      @apply md:col-span-2;
+      
+      .section-title {
+        @apply text-xl font-bold mb-4 pb-2 border-b border-gray-200;
+      }
+      
+      p {
+        @apply text-gray-700 leading-relaxed;
+      }
+    }
+    
+    .movie-credits {
+      @apply md:col-span-1 space-y-6;
+      
+      .section-title {
+        @apply text-xl font-bold mb-4 pb-2 border-b border-gray-200;
+      }
+      
+      .cast-list {
+        @apply space-y-4;
+      }
+      
+      .credit-item {
+        @apply flex items-center gap-3;
+        
+        .credit-image {
+          @apply w-12 h-12 rounded-full object-cover;
+        }
+        
+        .no-profile-image {
+          @apply w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 font-bold;
+        }
+        
+        .credit-info {
+          @apply flex-1;
+          
+          .credit-name {
+            @apply font-medium;
+          }
+          
+          .credit-role {
+            @apply text-sm text-gray-600;
+          }
+        }
+      }
+      
+      .no-content {
+        @apply text-gray-500 italic;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .movie-details {
+    .movie-hero {
+      @apply flex flex-col items-center text-center;
+      
+      .movie-header {
+        @apply w-full;
+        
+        .movie-genres {
+          @apply justify-center;
+        }
+      }
+    }
+  }
+}
