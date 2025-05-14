@@ -4,14 +4,15 @@
 // Importer les fichiers de layout et animations
 @use 'layout';
 @use 'animations';
+@use 'transitions';
 
 // Importer les composants
-@use 'components/header';
-@use 'components/footer';
-@use 'components/movies';
-@use 'components/movie-details';
+@use 'components/comments';
 @use 'components/filters';
-@use 'transitions';
+@use 'components/footer';
+@use 'components/header';
+@use 'components/movie-details';
+@use 'components/movies';
 
 // Importations de base
 @tailwind base;

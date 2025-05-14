@@ -127,7 +127,7 @@
     }
     
     .movie-credits {
-      @apply md:col-span-1 space-y-6;
+      @apply md:col-span-1 space-y-6 mt-6;
       
       .section-title {
         @apply text-xl font-bold mb-4 pb-2 border-b border-gray-200;

@@ -163,57 +163,60 @@ useHead(() => ({
           <h2 class="section-title">Synopsis</h2>
           <p v-if="currentMovie.overview">{{ currentMovie.overview }}</p>
           <p v-else class="no-content">Pas de synopsis disponible.</p>
-        </div>
-        
-        <!-- Informations sur l'équipe et le casting -->
-        <div class="movie-credits">
-          <!-- Réalisateur -->
-          <div class="movie-director">
-            <h2 class="section-title">Réalisateur</h2>
-            <div v-if="director" class="credit-item">
-              <img 
-                v-if="director.profile_path" 
-                :src="`https://image.tmdb.org/t/p/w185${director.profile_path}`" 
-                :alt="director.name"
-                class="credit-image"
-              />
-              <div v-else class="no-profile-image">
-                <span>{{ director.name.charAt(0) }}</span>
-              </div>
-              <div class="credit-info">
-                <p class="credit-name">{{ director.name }}</p>
-                <p class="credit-role">Réalisateur</p>
-              </div>
-            </div>
-            <p v-else class="no-content">Réalisateur inconnu</p>
-          </div>
-          
-          <!-- Acteurs principaux -->
-          <div class="movie-cast">
-            <h2 class="section-title">Têtes d'affiche</h2>
-            <div v-if="mainCast.length > 0" class="cast-list">
-              <div 
-                v-for="actor in mainCast" 
-                :key="actor.id" 
-                class="credit-item"
-              >
+
+          <div class="movie-credits">
+            <!-- Réalisateur -->
+            <div class="movie-director">
+              <h2 class="section-title">Réalisateur</h2>
+              <div v-if="director" class="credit-item">
                 <img 
-                  v-if="actor.profile_path" 
-                  :src="`https://image.tmdb.org/t/p/w185${actor.profile_path}`" 
-                  :alt="actor.name"
+                  v-if="director.profile_path" 
+                  :src="`https://image.tmdb.org/t/p/w185${director.profile_path}`" 
+                  :alt="director.name"
                   class="credit-image"
                 />
                 <div v-else class="no-profile-image">
-                  <span>{{ actor.name.charAt(0) }}</span>
+                  <span>{{ director.name.charAt(0) }}</span>
                 </div>
                 <div class="credit-info">
-                  <p class="credit-name">{{ actor.name }}</p>
-                  <p class="credit-role">{{ actor.character }}</p>
+                  <p class="credit-name">{{ director.name }}</p>
+                  <p class="credit-role">Réalisateur</p>
                 </div>
               </div>
+              <p v-else class="no-content">Réalisateur inconnu</p>
             </div>
-            <p v-else class="no-content">Aucun acteur listé</p>
+            
+            <!-- Acteurs principaux -->
+            <div class="movie-cast">
+              <h2 class="section-title">Têtes d'affiche</h2>
+              <div v-if="mainCast.length > 0" class="cast-list">
+                <div 
+                  v-for="actor in mainCast" 
+                  :key="actor.id" 
+                  class="credit-item"
+                >
+                  <img 
+                    v-if="actor.profile_path" 
+                    :src="`https://image.tmdb.org/t/p/w185${actor.profile_path}`" 
+                    :alt="actor.name"
+                    class="credit-image"
+                  />
+                  <div v-else class="no-profile-image">
+                    <span>{{ actor.name.charAt(0) }}</span>
+                  </div>
+                  <div class="credit-info">
+                    <p class="credit-name">{{ actor.name }}</p>
+                    <p class="credit-role">{{ actor.character }}</p>
+                  </div>
+                </div>
+              </div>
+              <p v-else class="no-content">Aucun acteur listé</p>
+            </div>
           </div>
+        </div>
+
+        <div class="movie-comments-container">
+          <MovieComments :movie-id="movieId" />
         </div>
       </div>
     </div>
