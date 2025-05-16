@@ -1,8 +1,12 @@
 .app-header {
   @apply bg-white shadow-sm sticky top-0 z-50;
+
+  .container {
+    @apply flex items-center py-6;
+  }
   
   .app-title {
-    @apply text-2xl font-bold text-tmdb-dark mb-4;
+    @apply text-2xl font-bold text-tmdb-dark mb-4 cursor-pointer mb-0;
     
     &-highlight {
       @apply text-tmdb-light;

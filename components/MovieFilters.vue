@@ -64,46 +64,46 @@ function changeLanguage(language: string) {
 <template>
   <div class="filters-container" :class="{ 'disabled': searchMode }">
     <!-- Message si en mode recherche -->
-    <div v-if="searchMode" class="search-active-notice">
-      <p>Les filtres sont désactivés pendant la recherche</p>
-    </div>
+    <v-alert
+      v-if="searchMode"
+      class="search-active-notice"
+      density="compact"
+      text="Les filtres sont désactivés pendant la recherche"
+      type="warning"
+    ></v-alert>
     
     <!-- Filtres de catégorie -->
     <div class="filter-group">
-      <label class="filter-label">Catégorie</label>
-      <select 
+      <v-select
+        label="Catégorie"
         v-model="localCategory"
-        @change="changeCategory(localCategory)"
-        class="filter-select"
+        :items="categoryOptions"
+        item-title="label"
+        item-value="value"
         :disabled="searchMode"
-      >
-        <option 
-          v-for="option in categoryOptions" 
-          :key="option.value" 
-          :value="option.value"
-        >
-          {{ option.label }}
-        </option>
-      </select>
+        density="compact"
+        variant="outlined"
+        hide-details
+        class="filter-select"
+        @update:model-value="changeCategory"
+      ></v-select>
     </div>
     
     <!-- Filtre de langue -->
     <div class="filter-group">
-      <label class="filter-label">Langue</label>
-      <select 
+      <v-select
+        label="Langue"
         v-model="languageFilter"
-        @change="changeLanguage(languageFilter)"
-        class="filter-select"
+        :items="languageOptions"
+        item-title="label"
+        item-value="value"
         :disabled="searchMode"
-      >
-        <option 
-          v-for="option in languageOptions" 
-          :key="option.value" 
-          :value="option.value"
-        >
-          {{ option.label }}
-        </option>
-      </select>
+        density="compact"
+        variant="outlined"
+        hide-details
+        class="filter-select"
+        @update:model-value="changeLanguage"
+      ></v-select>
     </div>
   </div>
 </template>

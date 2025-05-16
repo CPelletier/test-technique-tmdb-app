@@ -50,12 +50,12 @@
     
     .movie-backdrop {
       @apply absolute inset-0 bg-cover bg-center;
-      // filter: blur(20px);
+      filter: blur(2px);
       
-      // &::after {
-      //   content: '';
-      //   @apply absolute inset-0 bg-gradient-to-t from-white to-transparent;
-      // }
+      &::after {
+        content: '';
+        @apply absolute inset-0 bg-gradient-to-t from-white to-transparent;
+      }
     }
     
     .movie-backdrop-fallback {

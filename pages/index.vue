@@ -5,7 +5,9 @@ import { storeToRefs } from 'pinia';
 import MovieFilters from '~/components/MovieFilters.vue';
 import MovieGrid from '~/components/MovieGrid.vue';
 import InfiniteScroll from '~/components/InfiniteScroll.vue';
+import { useRoute } from 'vue-router';
 
+const route = useRoute();
 const moviesStore = useMoviesStore();
 const { isLoading, error, hasMore } = storeToRefs(moviesStore);
 
@@ -18,6 +20,16 @@ function loadMore() {
 onMounted(() => {
   moviesStore.fetchAllMovies(1, '');
 });
+
+watch(() => route.query.search, (newSearchQuery) => {
+  if (newSearchQuery) {
+    moviesStore.searchMovies(newSearchQuery as string);
+  } else if (!route.query.search && moviesStore.searchMode) {
+    // Revenir à l'affichage normal si on supprime le paramètre de recherche
+    moviesStore.searchMovies('');
+  }
+}, { immediate: true });
+
 </script>
 
 <template>
@@ -40,9 +52,3 @@ onMounted(() => {
     />
   </main>
 </template>
-
-<style lang="scss">
-main.container {
-  @apply mx-auto px-4 py-6 max-w-7xl flex-grow;
-}
-</style>

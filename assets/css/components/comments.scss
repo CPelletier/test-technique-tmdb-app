@@ -37,13 +37,9 @@
         @apply font-bold;
       }
     }
-    
-    .rating-stars {
-      @apply mt-2 text-lg;
-      
-      :deep(span) {
-        @apply text-yellow-500;
-      }
+
+    .rating-container {
+      @apply flex flex-col;
     }
   }
   

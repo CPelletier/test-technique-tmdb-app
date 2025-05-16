@@ -76,9 +76,7 @@ useHead(() => ({
 <template>
   <main class="movie-details-container">
     <!-- Bouton de retour -->
-    <button @click="goBack" class="back-button">
-      &larr; Retour aux films
-    </button>
+    <v-btn prepend-icon="mdi-arrow-left" @click="goBack" color="blue-darken-1">Retour aux film</v-btn>
     
     <!-- Affichage du chargement -->
     <div v-if="isLoadingMovie" class="loading-container">
@@ -100,12 +98,12 @@ useHead(() => ({
       <!-- Section principale avec l'affiche et les informations générales -->
       <div class="movie-hero">
         <!-- Fond flou avec l'image de fond du film -->
-        <div 
+        <!-- <div 
           v-if="currentMovie.backdrop_path" 
           class="movie-backdrop" 
           :style="`background-image: url(https://image.tmdb.org/t/p/w1280${currentMovie.backdrop_path})`"
         ></div>
-        <div v-else class="movie-backdrop-fallback"></div>
+        <div v-else class="movie-backdrop-fallback"></div> -->
         
         <!-- Conteneur pour l'affiche -->
         <div class="movie-poster-container">
@@ -122,6 +120,7 @@ useHead(() => ({
         </div>
         
         <!-- En-tête avec le titre et les métadonnées -->
+
         <div class="movie-header">
           <h1 class="movie-title">{{ currentMovie.title }}</h1>
           
@@ -225,9 +224,9 @@ useHead(() => ({
     <div v-else class="not-found">
       <h2>Film non trouvé</h2>
       <p>Désolé, nous n'avons pas pu trouver le film demandé.</p>
-      <button @click="goBack" class="back-button">
+      <v-btn @click="goBack" class="back-button">
         Retourner à la liste des films
-      </button>
+      </v-btn>
     </div>
   </main>
 </template>

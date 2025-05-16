@@ -237,7 +237,29 @@ function generateStars(rating: number): string {
       <!-- Note -->
       <div class="form-group">
         <label for="rating">Note du film (1-10)</label>
-        <div class="rating-input">
+        <div class="rating-container">
+        <!-- Composant v-rating avec 10 étoiles -->
+        <v-rating
+          v-model="formData.rating"
+          :length="10"
+          hover
+          color="amber"
+          active-color="amber-darken-3"
+          half-increments
+          :clearable="false"
+          size="small"
+          density="compact"
+        ></v-rating>
+        
+        <!-- Affichage de la valeur numérique à côté -->
+        <span class="rating-value">{{ formData.rating }}/10</span>
+      </div>
+      
+      <!-- Message d'erreur de validation -->
+      <div v-if="v$.rating.$error" class="error-feedback">
+        <span>La note doit être entre 1 et 10.</span>
+      </div>
+        <!-- <div class="rating-input">
           <input
             id="rating"
             v-model.number="formData.rating"
@@ -254,7 +276,7 @@ function generateStars(rating: number): string {
         </div>
         <div v-if="v$.rating.$error" class="error-feedback">
           <span>La note doit être entre 1 et 10.</span>
-        </div>
+        </div> -->
       </div>
       
       <div class="form-actions">

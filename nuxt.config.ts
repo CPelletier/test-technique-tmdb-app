@@ -10,7 +10,8 @@ export default defineNuxtConfig({
   modules: [
     '@nuxtjs/tailwindcss',
     '@pinia/nuxt',
-    '@vueuse/nuxt'
+    '@vueuse/nuxt',
+    'vuetify-nuxt-module'
   ],
   tailwindcss: {
     cssPath: '~/assets/css/main.scss',
