@@ -46,7 +46,7 @@
   @apply flex flex-col gap-8;
   
   .movie-hero {
-    @apply relative rounded-xl overflow-hidden p-4 md:p-8;
+    @apply relative rounded-xl overflow-hidden pt-6;
     
     .movie-backdrop {
       @apply absolute inset-0 bg-cover bg-center;
