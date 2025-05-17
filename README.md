@@ -6,17 +6,18 @@ Une application web moderne pour explorer les films en utilisant l'API de The Mo
 
 - Nuxt 3
 - TypeScript
-- Pinia + PiniaColada
+- Pinia
 - Tailwind CSS + SCSS
 - Vuelidate
 - VueUse
 - ESLint
 - Vitest
+- Vuetify
 
 ## Configuration requise
 
 - Node.js 16+
-- NPM ou Yarn
+- PNPM
 
 ## Installation
 
@@ -26,7 +27,7 @@ git clone https://github.com/votre-username/test-technique-tmdb-app.git
 cd test-technique-tmdb-app
 
 # Installer les dépendances
-npm install
+pnpm install
 
 # Copier le fichier .env.example et configurer la clé API TMDB
 cp .env.example .env
