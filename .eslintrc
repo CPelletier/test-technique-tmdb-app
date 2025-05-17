@@ -2,17 +2,203 @@
   "root": true,
   "env": {
     "browser": true,
-    "node": true
+    "node": true,
+    "es2022": true
+  },
+  "parser": "vue-eslint-parser",
+  "parserOptions": {
+    "parser": "@typescript-eslint/parser",
+    "ecmaVersion": 2022,
+    "sourceType": "module"
   },
   "extends": [
     "@nuxtjs/eslint-config-typescript",
-    "plugin:vue/vue3-recommended"
+    "plugin:vue/vue3-recommended",
+    "plugin:nuxt/recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:import/recommended",
+    "plugin:import/typescript",
+    "plugin:promise/recommended",
+    "plugin:sonarjs/recommended",
+    "plugin:vue-a11y/recommended"
   ],
+  "plugins": [
+    "@typescript-eslint",
+    "import",
+    "promise",
+    "sonarjs",
+    "vue-a11y"
+  ],
+  "settings": {
+    "import/resolver": {
+      "typescript": true,
+      "node": true
+    }
+  },
   "rules": {
+    // Vue specific rules
     "vue/multi-word-component-names": "off",
     "vue/no-multiple-template-root": "off",
     "vue/no-v-for-template-key": "off",
+    "vue/component-name-in-template-casing": ["error", "PascalCase"],
+    "vue/component-definition-name-casing": ["error", "PascalCase"],
+    "vue/attributes-order": ["error", {
+      "order": [
+        "DEFINITION",
+        "LIST_RENDERING",
+        "CONDITIONALS",
+        "RENDER_MODIFIERS",
+        "GLOBAL",
+        "UNIQUE",
+        "TWO_WAY_BINDING",
+        "OTHER_DIRECTIVES",
+        "OTHER_ATTR",
+        "EVENTS",
+        "CONTENT"
+      ],
+      "alphabetical": false
+    }],
+    "vue/max-attributes-per-line": ["error", {
+      "singleline": 3,
+      "multiline": 1
+    }],
+    "vue/html-self-closing": ["error", {
+      "html": {
+        "void": "always",
+        "normal": "always",
+        "component": "always"
+      }
+    }],
+
+    // TypeScript rules
+    "@typescript-eslint/explicit-function-return-type": "off",
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+    "@typescript-eslint/no-explicit-any": "warn",
+    "@typescript-eslint/no-unused-vars": ["warn", {
+      "argsIgnorePattern": "^_",
+      "varsIgnorePattern": "^_",
+      "caughtErrorsIgnorePattern": "^_"
+    }],
+    "@typescript-eslint/consistent-type-imports": ["error", {
+      "prefer": "type-imports"
+    }],
+    "@typescript-eslint/naming-convention": [
+      "error",
+      {
+        "selector": "interface",
+        "format": ["PascalCase"],
+        "custom": {
+          "regex": "^I[A-Z]",
+          "match": false
+        }
+      },
+      {
+        "selector": "typeAlias",
+        "format": ["PascalCase"]
+      },
+      {
+        "selector": "enum",
+        "format": ["PascalCase"]
+      }
+    ],
+
+    // Import rules
+    "import/order": ["error", {
+      "groups": [
+        "builtin",
+        "external",
+        "internal",
+        ["parent", "sibling"],
+        "object",
+        "type",
+        "index"
+      ],
+      "pathGroups": [
+        {
+          "pattern": "vue",
+          "group": "external",
+          "position": "before"
+        },
+        {
+          "pattern": "@/**",
+          "group": "internal"
+        },
+        {
+          "pattern": "~/**",
+          "group": "internal"
+        }
+      ],
+      "pathGroupsExcludedImportTypes": ["vue"],
+      "newlines-between": "always",
+      "alphabetize": {
+        "order": "asc",
+        "caseInsensitive": true
+      }
+    }],
+    "import/no-unresolved": "error",
+    "import/no-duplicates": "error",
+
+    // Code quality rules
     "no-console": "warn",
-    "no-debugger": "warn"
-  }
+    "no-debugger": "warn",
+    "no-unused-vars": "off", // Using TypeScript version
+    "no-useless-constructor": "error",
+    "no-var": "error",
+    "prefer-const": "error",
+    "prefer-rest-params": "error",
+    "prefer-spread": "error",
+    "require-await": "error",
+    "sonarjs/cognitive-complexity": ["error", 15],
+    "sonarjs/no-duplicate-string": ["error", { "threshold": 3 }],
+    "max-lines-per-function": ["warn", { "max": 100, "skipBlankLines": true, "skipComments": true }],
+    "max-depth": ["error", 4],
+    "eqeqeq": ["error", "always"],
+
+    // Promise rules
+    "promise/always-return": "warn",
+    "promise/catch-or-return": "warn",
+    "promise/no-nesting": "warn",
+    
+    // Formatting rules
+    "semi": ["error", "always"],
+    "quotes": ["error", "single", { "avoidEscape": true }],
+    "comma-dangle": ["error", "always-multiline"],
+    "arrow-parens": ["error", "always"],
+    "space-before-function-paren": ["error", {
+      "anonymous": "always",
+      "named": "never",
+      "asyncArrow": "always"
+    }]
+  },
+  "overrides": [
+    // For test files
+    {
+      "files": ["tests/**/*.ts", "tests/**/*.spec.ts", "**/__tests__/**/*.ts"],
+      "env": {
+        "jest": true,
+        "vitest": true
+      },
+      "rules": {
+        "no-console": "off",
+        "max-lines-per-function": "off",
+        "sonarjs/no-duplicate-string": "off",
+        "@typescript-eslint/no-explicit-any": "off"
+      }
+    },
+    // For Vue files
+    {
+      "files": ["*.vue"],
+      "rules": {
+        "indent": "off"
+      }
+    }
+  ],
+  "ignorePatterns": [
+    "node_modules",
+    ".nuxt",
+    "dist",
+    "coverage",
+    "public",
+    "**/*.d.ts"
+  ]
 }
