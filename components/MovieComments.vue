@@ -5,6 +5,7 @@ import { useVuelidate } from '@vuelidate/core';
 import { required, minLength, maxLength, helpers } from '@vuelidate/validators';
 import Editor from '@tinymce/tinymce-vue';
 import { commentService, type Comment as CommentType } from '~/services/commentService';
+import { countTextCharacters, generateStars } from '~/utils/textUtils';
 
 declare global {
   interface Window {
@@ -39,20 +40,6 @@ const editorConfig = {
   height: 200,
   content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 14px }',
 };
-
-// Fonction pour compter uniquement les caractères de texte (sans HTML)
-function countTextCharacters(html: string): number {
-  if (!html) return 0;
-  
-  // Créer un élément div temporaire
-  const tempDiv = document.createElement('div');
-  // Définir le HTML à l'intérieur
-  tempDiv.innerHTML = html;
-  // Récupérer uniquement le texte
-  const textOnly = tempDiv.textContent || tempDiv.innerText || '';
-  // Renvoyer la longueur du texte
-  return textOnly.length;
-}
 
 // Création d'une valeur calculée pour afficher le nombre de caractères réel
 const textCharacterCount = computed(() => {
@@ -182,11 +169,6 @@ function formatDate(dateString: string): string {
     minute: '2-digit'
   });
 }
-
-// Générer des étoiles pour la note
-function generateStars(rating: number): string {
-  return '★'.repeat(rating) + '☆'.repeat(10 - rating);
-}
 </script>
 
 <template>
@@ -245,7 +227,6 @@ function generateStars(rating: number): string {
           hover
           color="amber"
           active-color="amber-darken-3"
-          half-increments
           :clearable="false"
           size="small"
           density="compact"
@@ -259,24 +240,6 @@ function generateStars(rating: number): string {
       <div v-if="v$.rating.$error" class="error-feedback">
         <span>La note doit être entre 1 et 10.</span>
       </div>
-        <!-- <div class="rating-input">
-          <input
-            id="rating"
-            v-model.number="formData.rating"
-            type="range"
-            min="1"
-            max="10"
-            step="1"
-            class="range-input"
-          />
-          <span class="rating-value">{{ formData.rating }}/10</span>
-        </div>
-        <div class="rating-stars">
-          {{ generateStars(formData.rating) }}
-        </div>
-        <div v-if="v$.rating.$error" class="error-feedback">
-          <span>La note doit être entre 1 et 10.</span>
-        </div> -->
       </div>
       
       <div class="form-actions">

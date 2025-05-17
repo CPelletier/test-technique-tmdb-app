@@ -1,7 +1,8 @@
-// stores/movies.ts
+// stores/movies.ts (Corrigé)
 import { defineStore } from 'pinia';
-import { ref, computed } from 'vue';
+import { ref } from 'vue';
 import type { Movie, MovieCategory, UICategoryType, SortOption, FullMovieDetails } from '~/types/tmdb';
+import { useTmdb } from '~/composables/useTmdb';
 
 export const useMoviesStore = defineStore('movies', () => {
   // États existants
@@ -28,11 +29,10 @@ export const useMoviesStore = defineStore('movies', () => {
   
   // Actions
   async function fetchMoviesByCategory(category: MovieCategory, page = 1, language = '', reset = true) {
+    const $tmdb = useTmdb();
     // Réinitialiser le mode de recherche
     searchMode.value = false;
     currentSearchQuery.value = '';
-    
-    const { $tmdb } = useNuxtApp();
     
     if (page === 1 || reset) {
       isLoading.value = true;
@@ -49,10 +49,10 @@ export const useMoviesStore = defineStore('movies', () => {
         movies.value = data.results;
       } else {
         // Ajouter les nouveaux films tout en évitant les doublons
-        const newMovieIds = new Set(data.results.map(m => m.id));
-        const existingMovieIds = new Set(movies.value.map(m => m.id));
+        const newMovieIds = new Set(data.results.map((m: Movie) => m.id));
+        const existingMovieIds = new Set(movies.value.map((m: Movie) => m.id));
         
-        const uniqueNewMovies = data.results.filter(movie => !existingMovieIds.has(movie.id));
+        const uniqueNewMovies = data.results.filter((movie: Movie) => !existingMovieIds.has(movie.id));
         movies.value = [...movies.value, ...uniqueNewMovies];
       }
       
@@ -76,7 +76,7 @@ export const useMoviesStore = defineStore('movies', () => {
     currentSearchQuery.value = '';
     currentSortOption.value = sortBy;
     
-    const { $tmdb } = useNuxtApp();
+    const $tmdb = useTmdb();
     
     if (page === 1 || reset) {
       isLoading.value = true;
@@ -93,10 +93,10 @@ export const useMoviesStore = defineStore('movies', () => {
         movies.value = data.results;
       } else {
         // Ajouter les nouveaux films
-        const newMovieIds = new Set(data.results.map(m => m.id));
-        const existingMovieIds = new Set(movies.value.map(m => m.id));
+        const newMovieIds = new Set(data.results.map((m: Movie) => m.id));
+        const existingMovieIds = new Set(movies.value.map((m: Movie) => m.id));
         
-        const uniqueNewMovies = data.results.filter(movie => !existingMovieIds.has(movie.id));
+        const uniqueNewMovies = data.results.filter((movie: Movie) => !existingMovieIds.has(movie.id));
         movies.value = [...movies.value, ...uniqueNewMovies];
       }
       
@@ -129,7 +129,7 @@ export const useMoviesStore = defineStore('movies', () => {
     searchMode.value = true;
     currentSearchQuery.value = query;
     
-    const { $tmdb } = useNuxtApp();
+    const $tmdb = useTmdb();
     
     if (page === 1 || reset) {
       isLoading.value = true;
@@ -144,10 +144,10 @@ export const useMoviesStore = defineStore('movies', () => {
         movies.value = data.results;
       } else {
         // Ajouter les nouveaux films
-        const newMovieIds = new Set(data.results.map(m => m.id));
-        const existingMovieIds = new Set(movies.value.map(m => m.id));
+        const newMovieIds = new Set(data.results.map((m: Movie) => m.id));
+        const existingMovieIds = new Set(movies.value.map((m: Movie) => m.id));
         
-        const uniqueNewMovies = data.results.filter(movie => !existingMovieIds.has(movie.id));
+        const uniqueNewMovies = data.results.filter((movie: Movie) => !existingMovieIds.has(movie.id));
         movies.value = [...movies.value, ...uniqueNewMovies];
       }
       
@@ -184,7 +184,7 @@ export const useMoviesStore = defineStore('movies', () => {
   }
 
   async function fetchMovieDetails(id: number) {
-    const { $tmdb } = useNuxtApp();
+    const $tmdb = useTmdb();
     isLoadingMovie.value = true;
     movieError.value = null;
     

@@ -5,6 +5,10 @@
     "types": [
       "node",
       "vitest/globals"
-    ]
+    ],
+    "paths": {
+      "~/*": ["./*"],
+      "#app": ["./.nuxt/types/app.d.ts"]
+    }
   }
 }

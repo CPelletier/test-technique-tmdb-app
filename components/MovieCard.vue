@@ -1,6 +1,6 @@
 <!-- components/MovieCard.vue -->
 <script setup lang="ts">
-import { defineProps, ref } from 'vue';
+import { ref } from 'vue';
 import { useIntersectionObserver } from '@vueuse/core';
 import type { Movie } from '~/types/tmdb';
 import { generateSlug } from '~/utils/slug';

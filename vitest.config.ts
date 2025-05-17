@@ -10,17 +10,26 @@ export default defineConfig({
   plugins: [vue()],
   test: {
     globals: true,
-    environment: 'happy-dom',
+    environment: 'jsdom',
+    deps: {
+      optimizer: {
+        web: {
+          include: ['@nuxt/test-utils', '@vueuse/core']
+        }
+      }
+    },
     include: ['**/*.{test,spec}.{js,ts,jsx,tsx}'],
     exclude: ['node_modules', 'dist', '.nuxt', '.output'],
     coverage: {
       reporter: ['text', 'json', 'html']
-    }
+    },
+    setupFiles: ['./tests/setup.ts']
   },
   resolve: {
     alias: {
-      '~': resolve(__dirname, '.'),
-      '@': resolve(__dirname, '.')
+      '~': fileURLToPath(new URL('./', import.meta.url)),
+      '#app': resolve(dirname(fileURLToPath(import.meta.url)), 'node_modules/nuxt/dist/app'),
+      '@vueuse/core': resolve(dirname(fileURLToPath(import.meta.url)), 'node_modules/@vueuse/core')
     }
   }
 });

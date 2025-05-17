@@ -58,6 +58,7 @@ function handleSearch() {
   <div class="search-container">
     <div class="search-input-group">
       <v-text-field
+        data-test="search-input"
         density="compact"
         variant="outlined"
         hide-details
@@ -67,7 +68,7 @@ function handleSearch() {
         prepend-inner-icon="mdi-magnify"
       >
       </v-text-field>
-      <v-btn @click="handleSearch" class="search-button" color="blue-darken-1">Rechercher</v-btn>
+      <v-btn data-test="search-button" @click="handleSearch" class="search-button" color="blue-darken-1">Rechercher</v-btn>
     </div>
     <div v-if="searchMode" class="search-status">
       <p>Résultats pour: "{{ currentSearchQuery }}"</p>
@@ -84,17 +85,3 @@ function handleSearch() {
     </div>
   </div>
 </template>
-
-<!-- <style lang="scss" scoped>
-.search-container {
-  @apply max-w-xl w-full;
-  
-  .search-input-group {
-    @apply flex items-center gap-2;
-  }
-  
-  .search-status {
-    @apply mt-2 flex items-center justify-between text-sm text-gray-600;
-  }
-}
-</style> -->
